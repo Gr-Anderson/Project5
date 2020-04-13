@@ -21,15 +21,15 @@ class WordDice{
 		vector<Node *> word;
 };
 
-void *read_dice(istream &input, WordDice *WD);
-void *read_word(istream &input, WordDice *WD);
+void *read_dice(istream &input, WordDice &WD);
+void *read_word(istream &input, WordDice &WD);
 
 int main(int argc, char *argv[]){
 
 	if(argc != 3)
 		return -1;
 
-	WordDice *WD;
+	WordDice WD;
 
 	ifstream FileDice(argv[1]);
 	read_dice(FileDice, WD);
@@ -39,53 +39,56 @@ int main(int argc, char *argv[]){
 	read_word(FileWord, WD);
 	FileWord.close();
 
+	//beginning of making the bipartite graph
 
-/*	for(int i = 0; i < WD->dice.size(); i++)
-		cout << WD->dice[i]->letters << '\n';
+/*
+	for(int word = 0; i < WD.word.size(); i++)
+		for(int wordLetter = 0; wordLetter < WD.word[word].size(); wordLetter++)
+			for(int dice = 0; dice < WD.dice.size(); dice++)
+				for(int diceLetter = 0; diceLetter < WD.dice[dice].size(); diceLetter++){
 
-	for(int i = 0; i < WD->word.size(); i++)
-		cout << WD->word[i]->letters << '\n';
+
+					if(word[wordLetter].find(dice[diceLetter]) != npos)
+						WD.word[word].edges.push_back(
+	
 */
 	return 0;
 
 }
 
-void *read_dice(istream &input, WordDice *WD){
+void *read_dice(istream &input, WordDice &WD){
 
 	string die;
 	int i = 0;
-	Node *nDice = new Node;
 
 	while(input >> die){
 
-		cout << die << '\n';
+		Node *nDice = new Node;
+
 		nDice->letters = die;
 		nDice->index = i;
-		//this line is causing the segfault
-		WD->dice.push_back(nDice);
+		WD.dice.push_back(nDice);
 		i++;
 
 	}
 
-	return 0;
 }
 
-void *read_word(istream &input, WordDice *WD){
+void *read_word(istream &input, WordDice &WD){
 
 	string word;
 	int i = 0;
-	Node *nWord = new Node;
 
 	while(input >> word){
+	
+		Node *nWord = new Node;
 
-		cout << word << '\n';
 		nWord->letters = word;
-		nWord->index = i;
-//		WD->word.push_back(nWord);
+		nWord->index = i;	
+		WD.word.push_back(nWord);
 		i++;
 
 	}
 
-	return 0;
 }
 
