@@ -30,6 +30,8 @@ int main(int argc, char *argv[]){
 	Node *source = new Node;
 	Node *sink = new Node;
 
+	source->index = 0;
+
 	WordDice WD;
 
 	ifstream FileDice(argv[1]);
@@ -41,8 +43,9 @@ int main(int argc, char *argv[]){
 
 	while(FileWord >> word){
 
-	int index = WD.dice.size()+1;
+		int index = WD.dice.size()+1;
 
+		//reading words
 
 		for(int i = 0; i < word.size(); i++){
 
@@ -53,55 +56,72 @@ int main(int argc, char *argv[]){
 			WD.word.push_back(nLetter);
 			index++;
 		}
-	
-	//making the bipartite graph
 
-	for(int numWord = 0; numWord < WD.word.size(); numWord++){
-
-		WD.word[numWord]->edges.push_back(sink);
-
-		if(numWord == WD.word.size()-1)
-			sink->index = WD.word[numWord]->index+1;
-
-		for(int dice = 0; dice < WD.dice.size(); dice++){
-
+		//making the bipartite graph
+		
+		for(int dice = 0; dice < WD.dice.size(); dice++)
 			source->edges.push_back(WD.dice[dice]);
 
-			if(WD.dice[dice]->letters.find(WD.word[numWord]->letters) != string::npos){
-				WD.dice[dice]->edges.push_back(WD.word[numWord]);
-		
+		for(int numWord = 0; numWord < WD.word.size(); numWord++){
+
+			WD.word[numWord]->edges.push_back(sink);
+
+			if(numWord == WD.word.size()-1)
+				sink->index = WD.word[numWord]->index+1;
+
+			for(int dice = 0; dice < WD.dice.size(); dice++){
+
+				if(WD.dice[dice]->letters.find(WD.word[numWord]->letters) != string::npos){
+					WD.dice[dice]->edges.push_back(WD.word[numWord]);
+
+				}
 			}
 		}
-}
 
-	cout << "NODE 0: SOURCE Edges to 1 2 3 4" << '\n';
+		//checking connections
 
-	for(int i = 0; i < WD.dice.size(); i++){
+		cout << "NODE 0: SOURCE Edges to ";
 
-		cout << "Node " << WD.dice[i]->index << ": " << WD.dice[i]->letters << " Edges to ";
-
-		for(int j = 0; j < WD.dice[i]->edges.size(); j++)
-			cout << WD.dice[i]->edges[j]->index << ' ';
+		for(int i = 0; i < source->edges.size(); i++)
+			cout << source->edges[i]->index << ' ';
 
 		cout << '\n';
 
+		for(int i = 0; i < WD.dice.size(); i++){
+
+			cout << "Node " << WD.dice[i]->index << ": " << WD.dice[i]->letters << " Edges to ";
+
+			for(int j = 0; j < WD.dice[i]->edges.size(); j++)
+				cout << WD.dice[i]->edges[j]->index << ' ';
+
+			cout << '\n';
+
+		}
+
+		for(int i = 0; i < WD.word.size(); i++){
+			cout << "Node " << WD.word[i]->index << ": " << WD.word[i]->letters << " Edges to " << WD.word[i]->edges[0]->index << '\n';
+		}
+
+		cout << "Node " << sink->index << ": Edges to\n";
+
+		cout << '\n';
+
+		//need to delete the nodes for the current word's letters to make connections for the next word
+
+		source->edges.clear();
+
+		for(int i = 0; i < WD.word.size(); i++)
+			delete WD.word[i];
+
+		WD.word.clear();
+
+		for(int i = 0; i < WD.dice.size(); i++)
+			WD.dice[i]->edges.clear();
+
 	}
+	FileWord.close();
 
-
-	for(int i = 0; i < WD.word.size(); i++){
-		cout << "Node " << WD.word[i]->index << ": " << WD.word[i]->letters << " Edges to " << WD.word[i]->edges[0]->index << '\n';
-	}
-
-	cout << "Node " << sink->index << ": Edges to\n";
-	
-	cout << '\n';
-
-	//need to delete the nodes for the current word's letters to make connections for the next word
-	
-}
-FileWord.close();
-
-return 0;
+	return 0;
 
 }
 
@@ -118,28 +138,7 @@ void *read_dice(istream &input, WordDice &WD){
 		nDice->index = i;
 		WD.dice.push_back(nDice);
 		i++;
-		
+
 	}
 
 }
-/*
-void *read_word(istream &input, WordDice &WD){
-
-	string word;
-
-	int index = WD.dice.size()+1;
-
-	input >> word;
-
-		for(int i = 0; i < word.size(); i++){
-
-			Node *nLetter = new Node;
-
-			nLetter->letters = word[i];
-			nLetter->index = index;
-			WD.word.push_back(nLetter);
-			index++;
-		}
-
-}
-*/
