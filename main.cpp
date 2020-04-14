@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <queue>
 #include <fstream>
 #include <iostream>
 
@@ -21,6 +22,7 @@ class WordDice{
 
 void *read_dice(istream &input, WordDice &WD);
 void *read_word(istream &input, WordDice &WD);
+bool bfs(Node *&source, Node *&sink);
 
 int main(int argc, char *argv[]){
 
@@ -102,7 +104,7 @@ int main(int argc, char *argv[]){
 			cout << "Node " << WD.word[i]->index << ": " << WD.word[i]->letters << " Edges to " << WD.word[i]->edges[0]->index << '\n';
 		}
 
-		cout << "Node " << sink->index << ": Edges to\n";
+		cout << "Node " << sink->index << ": SINK Edges to\n";
 
 		cout << '\n';
 
@@ -141,4 +143,30 @@ void *read_dice(istream &input, WordDice &WD){
 
 	}
 
+}
+
+bool bfs(Node *&source, Node*&sink)
+{
+	queue <Node *> bfsqueue;
+	Node *curr;
+
+	bfsqueue.push(source);
+
+	while(bfsqueue.empty() == false)
+	{
+		curr = bfsqueue.front();
+		bfsqueue.pop();
+
+		for(int i = 0; i < curr->edges.size(); i++)
+		{
+			if (curr->edges[i]->backedge != NULL)
+				continue;
+			curr->edges[i]->backedge = curr;
+
+			if (curr->edges[i]->index == sink->index)
+				return true;
+			bfsqueue.push(curr->edges[i]);
+		}
+	}
+return false;
 }
