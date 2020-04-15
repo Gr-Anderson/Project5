@@ -23,8 +23,9 @@ class WordDice{
 
 void *read_dice(istream &input, WordDice &WD);
 void *read_word(istream &input, WordDice &WD);
-bool bfs(Node *&source, Node *&sink);
-int edmonds_karp(Node *&source, Node *&sink);
+bool bfs(Node *&source, Node *&sink, WordDice &WD);
+int edmonds_karp(Node *&source, Node *&sink, WordDice &WD);
+void clear_backedges(Node *&source, Node *&sink, WordDice &WD);
 
 int main(int argc, char *argv[]){
 
@@ -82,11 +83,11 @@ int main(int argc, char *argv[]){
 			}
 		}
 
-		int a = edmonds_karp(source, sink);
+//		int a = edmonds_karp(source, sink);
 
 		//checking connections
 
-		cout << "NODE 0: SOURCE Edges to ";
+/*		cout << "NODE 0: SOURCE Edges to ";
 
 		for(int i = 0; i < source->edges.size(); i++)
 			cout << source->edges[i]->index << ' ';
@@ -111,10 +112,16 @@ int main(int argc, char *argv[]){
 		cout << "Node " << sink->index << ": SINK Edges to\n";
 
 		cout << '\n';
+*/
+		if (edmonds_karp(source, sink, WD) == word.size())
+			cout << "We can spell the word\n\n";
+		else
+			cout << "We can not spell the word\n\n";
 
 		//need to delete the nodes for the current word's letters to make connections for the next word
 
 		source->edges.clear();
+		sink->edges.clear();
 
 		for(int i = 0; i < WD.word.size(); i++)
 			delete WD.word[i];
@@ -151,7 +158,7 @@ void *read_dice(istream &input, WordDice &WD){
 
 }
 
-bool bfs(Node *&source, Node*&sink)
+bool bfs(Node *&source, Node *&sink, WordDice &WD)
 {
 	queue <Node *> bfsqueue;
 	Node *curr;
@@ -162,30 +169,41 @@ bool bfs(Node *&source, Node*&sink)
 	{
 		curr = bfsqueue.front();
 		bfsqueue.pop();
+		
+//		cout << "BFS CURR = " << curr->index << '\n';
 
 		for(int i = 0; i < curr->edges.size(); i++)
 		{
 			if (curr->edges[i]->backedge != NULL)
+			{
+//				cout << "CURR ALREADY HAS BACKEDGE\n";
 				continue;
+			}
+
+//			cout << "setting " << curr->edges[i]->index << " backedge = " << curr->index << '\n';
 			curr->edges[i]->backedge = curr;
 
 			if (curr->edges[i]->index == sink->index)
+			{
+//				cout << "BFS RETURNS TRUE\n";
 				return true;
+			}
 			bfsqueue.push(curr->edges[i]);
 		}
 	}
+//cout << "BFS RETURNS FALSE\n";
 return false;
 }
 
-int edmonds_karp(Node *&source, Node *&sink)
+int edmonds_karp(Node *&source, Node *&sink, WordDice &WD)
 {
 	Node *curr;
+	Node *prev;
 
-	while (bfs(source, sink))
+	while (bfs(source, sink, WD))
 	{
 		for (curr = sink; curr != source; curr = curr->backedge)
 		{
-			
 			curr->edges.push_back(curr->backedge);
 
 			//FIXME this line needs to erase current node from the backedge's edges vector
@@ -196,10 +214,21 @@ int edmonds_karp(Node *&source, Node *&sink)
 			int ind = distance(curr->backedge->edges.begin(), it);
 
 			curr->backedge->edges.erase(curr->backedge->edges.begin()+ind);
-
-		//	curr->backedge = NULL;
-
 		}
+		clear_backedges(source, sink, WD);
 	}
+//	cout << "Sink->edges.size() = " << sink->edges.size() << '\n';
 	return sink->edges.size();
+}
+
+void clear_backedges(Node *&source, Node *&sink, WordDice &WD)
+{
+	source->backedge = NULL;
+	sink->backedge = NULL;
+
+	for (int i = 0; i < WD.dice.size(); i++)
+		WD.dice[i]->backedge = NULL;
+
+	for (int i = 0; i < WD.word.size(); i++)
+		WD.word[i]->backedge = NULL;
 }
