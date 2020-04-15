@@ -23,6 +23,7 @@ class WordDice{
 void *read_dice(istream &input, WordDice &WD);
 void *read_word(istream &input, WordDice &WD);
 bool bfs(Node *&source, Node *&sink);
+int edmonds_karp(Node *&source, Node *&sink);
 
 int main(int argc, char *argv[]){
 
@@ -169,4 +170,22 @@ bool bfs(Node *&source, Node*&sink)
 		}
 	}
 return false;
+}
+
+int edmonds_karp(Node *&source, Node *&sink)
+{
+	Node *curr;
+
+	while (bfs(source, sink))
+	{
+		for (curr = sink; curr != source; curr = curr->backedge)
+		{
+			curr->edges.push_back(curr->backedge);
+			//FIXME this line needs to erase current node from the backedge's edges vector
+			// but it takes the position instead of the actual node
+//			curr->backedge->edges.erase(curr);
+			curr->backedge = NULL;
+		}
+	}
+	return sink->edges.size();
 }
