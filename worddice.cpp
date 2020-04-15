@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
 		}
 
 		//making the bipartite graph
-		
+
 		for(int dice = 0; dice < WD.dice.size(); dice++)
 			source->edges.push_back(WD.dice[dice]);
 
@@ -82,37 +82,6 @@ int main(int argc, char *argv[]){
 				}
 			}
 		}
-
-//		int a = edmonds_karp(source, sink);
-
-		//checking connections
-
-/*		cout << "NODE 0: SOURCE Edges to ";
-
-		for(int i = 0; i < source->edges.size(); i++)
-			cout << source->edges[i]->index << ' ';
-
-		cout << '\n';
-
-		for(int i = 0; i < WD.dice.size(); i++){
-
-			cout << "Node " << WD.dice[i]->index << ": " << WD.dice[i]->letters << " Edges to ";
-
-			for(int j = 0; j < WD.dice[i]->edges.size(); j++)
-				cout << WD.dice[i]->edges[j]->index << ' ';
-
-			cout << '\n';
-
-		}
-
-		for(int i = 0; i < WD.word.size(); i++){
-			cout << "Node " << WD.word[i]->index << ": " << WD.word[i]->letters << " Edges to " << WD.word[i]->edges[0]->index << '\n';
-		}
-
-		cout << "Node " << sink->index << ": SINK Edges to\n";
-
-		cout << '\n';
-*/
 
 		if (edmonds_karp(source, sink, WD) == word.size())
 		{
@@ -143,8 +112,10 @@ int main(int argc, char *argv[]){
 
 		WD.word.clear();
 
-		for(int i = 0; i < WD.dice.size(); i++)
+		for(int i = 0; i < WD.dice.size(); i++){
 			WD.dice[i]->edges.clear();
+			WD.dice[i]->backedge = NULL;
+		}
 
 		sink->backedge = NULL;
 
@@ -184,30 +155,30 @@ bool bfs(Node *&source, Node *&sink, WordDice &WD)
 	{
 		curr = bfsqueue.front();
 		bfsqueue.pop();
-		
-//		cout << "BFS CURR = " << curr->index << '\n';
+
+		//		cout << "BFS CURR = " << curr->index << '\n';
 
 		for(int i = 0; i < curr->edges.size(); i++)
 		{
 			if (curr->edges[i]->backedge != NULL)
 			{
-//				cout << "CURR ALREADY HAS BACKEDGE\n";
+				//				cout << "CURR ALREADY HAS BACKEDGE\n";
 				continue;
 			}
 
-//			cout << "setting " << curr->edges[i]->index << " backedge = " << curr->index << '\n';
+			//			cout << "setting " << curr->edges[i]->index << " backedge = " << curr->index << '\n';
 			curr->edges[i]->backedge = curr;
 
 			if (curr->edges[i]->index == sink->index)
 			{
-//				cout << "BFS RETURNS TRUE\n";
+				//				cout << "BFS RETURNS TRUE\n";
 				return true;
 			}
 			bfsqueue.push(curr->edges[i]);
 		}
 	}
-//cout << "BFS RETURNS FALSE\n";
-return false;
+	//cout << "BFS RETURNS FALSE\n";
+	return false;
 }
 
 int edmonds_karp(Node *&source, Node *&sink, WordDice &WD)
@@ -219,8 +190,8 @@ int edmonds_karp(Node *&source, Node *&sink, WordDice &WD)
 	{
 		for (curr = sink; curr != source; curr = curr->backedge)
 		{
-//			cout << "curr->index = " << curr->index << '\n';
-//			cout << "curr->backedge = " << curr->backedge->index << '\n';
+			//			cout << "curr->index = " << curr->index << '\n';
+			//			cout << "curr->backedge = " << curr->backedge->index << '\n';
 
 			curr->edges.push_back(curr->backedge);
 
@@ -235,7 +206,7 @@ int edmonds_karp(Node *&source, Node *&sink, WordDice &WD)
 		}
 		clear_backedges(source, sink, WD);
 	}
-//	cout << "Sink->edges.size() = " << sink->edges.size() << '\n';
+	//	cout << "Sink->edges.size() = " << sink->edges.size() << '\n';
 	return sink->edges.size();
 }
 
