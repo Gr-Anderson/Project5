@@ -1,8 +1,8 @@
-all: main
+all: worddice
 
-main: main.cpp
-	g++ -std=c++11 -o main main.cpp
+worddice: worddice.cpp
+	g++ -std=c++11 -o worddice worddice.cpp
 
 .PHONY: clean
 clean:
-	rm -rf main
+	rm -rf worddice

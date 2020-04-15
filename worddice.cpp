@@ -113,10 +113,25 @@ int main(int argc, char *argv[]){
 
 		cout << '\n';
 */
+
 		if (edmonds_karp(source, sink, WD) == word.size())
-			cout << "We can spell the word\n\n";
+		{
+			for (int i = 0; i < WD.word.size(); i++)
+			{
+				cout << WD.word[i]->edges[0]->index - 1;
+
+				if (i == WD.word.size()-1)
+					cout << ": ";
+				else
+					cout << ",";
+			}
+			cout << word << '\n';
+		}
 		else
-			cout << "We can not spell the word\n\n";
+		{
+			cout << "Cannot spell " << word << '\n';
+
+		}
 
 		//need to delete the nodes for the current word's letters to make connections for the next word
 
@@ -204,6 +219,9 @@ int edmonds_karp(Node *&source, Node *&sink, WordDice &WD)
 	{
 		for (curr = sink; curr != source; curr = curr->backedge)
 		{
+//			cout << "curr->index = " << curr->index << '\n';
+//			cout << "curr->backedge = " << curr->backedge->index << '\n';
+
 			curr->edges.push_back(curr->backedge);
 
 			//FIXME this line needs to erase current node from the backedge's edges vector
