@@ -3,6 +3,7 @@
 #include <queue>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -81,6 +82,8 @@ int main(int argc, char *argv[]){
 			}
 		}
 
+		int a = edmonds_karp(source, sink);
+
 		//checking connections
 
 		cout << "NODE 0: SOURCE Edges to ";
@@ -120,6 +123,8 @@ int main(int argc, char *argv[]){
 
 		for(int i = 0; i < WD.dice.size(); i++)
 			WD.dice[i]->edges.clear();
+
+		sink->backedge = NULL;
 
 	}
 	FileWord.close();
@@ -180,11 +185,20 @@ int edmonds_karp(Node *&source, Node *&sink)
 	{
 		for (curr = sink; curr != source; curr = curr->backedge)
 		{
+			
 			curr->edges.push_back(curr->backedge);
+
 			//FIXME this line needs to erase current node from the backedge's edges vector
 			// but it takes the position instead of the actual node
-//			curr->backedge->edges.erase(curr);
-			curr->backedge = NULL;
+
+			vector<Node *>::iterator it = find(curr->backedge->edges.begin(), curr->backedge->edges.end(), curr);
+
+			int ind = distance(curr->backedge->edges.begin(), it);
+
+			curr->backedge->edges.erase(curr->backedge->edges.begin()+ind);
+
+		//	curr->backedge = NULL;
+
 		}
 	}
 	return sink->edges.size();
